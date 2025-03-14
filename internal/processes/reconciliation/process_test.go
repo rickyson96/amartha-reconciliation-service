@@ -5,20 +5,11 @@ import (
 	"time"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/govalues/decimal"
 	"github.com/rickyson96/amartha-reconciliation-service/internal/parsers/statements"
 	"github.com/rickyson96/amartha-reconciliation-service/internal/parsers/transactions"
 	"github.com/rickyson96/amartha-reconciliation-service/internal/processes/reconciliation"
+	"github.com/rickyson96/amartha-reconciliation-service/internal/testutils"
 )
-
-func newDecimal(t *testing.T, value int64, scale int) decimal.Decimal {
-	t.Helper()
-	d, err := decimal.New(value, scale)
-	if err != nil {
-		t.Errorf("newDecimal(%d, %d) failed: %v", value, scale, err)
-	}
-	return d
-}
 
 func TestProcess(t *testing.T) {
 	tests := []struct {
@@ -45,7 +36,7 @@ func TestProcess(t *testing.T) {
 			trancations: []transactions.Transaction{
 				{
 					TrxID:           "1",
-					Amount:          newDecimal(t, 10, 0),
+					Amount:          testutils.NewDecimal(t, 10, 0),
 					Type:            transactions.TransactionTypeCredit,
 					TransactionTime: time.Date(2025, 03, 14, 10, 10, 10, 10, time.Local),
 				},
@@ -53,7 +44,7 @@ func TestProcess(t *testing.T) {
 			statements: map[string][]statements.Statement{
 				"bank1.csv": {{
 					UniqueIdentifier: "10",
-					Amount:           newDecimal(t, 10, 0),
+					Amount:           testutils.NewDecimal(t, 10, 0),
 					Date:             time.Date(2025, 03, 14, 10, 10, 10, 10, time.Local),
 				}},
 			},
@@ -74,7 +65,7 @@ func TestProcess(t *testing.T) {
 			trancations: []transactions.Transaction{
 				{
 					TrxID:           "1",
-					Amount:          newDecimal(t, 10, 0),
+					Amount:          testutils.NewDecimal(t, 10, 0),
 					Type:            transactions.TransactionTypeCredit,
 					TransactionTime: time.Date(2025, 03, 14, 10, 10, 10, 10, time.Local),
 				},
@@ -82,7 +73,7 @@ func TestProcess(t *testing.T) {
 			statements: map[string][]statements.Statement{
 				"bank1.csv": {{
 					UniqueIdentifier: "10",
-					Amount:           newDecimal(t, 10, 0),
+					Amount:           testutils.NewDecimal(t, 10, 0),
 					Date:             time.Date(2025, 03, 14, 0, 0, 0, 0, time.Local),
 				}},
 			},
@@ -103,13 +94,13 @@ func TestProcess(t *testing.T) {
 			trancations: []transactions.Transaction{
 				{
 					TrxID:           "1",
-					Amount:          newDecimal(t, 10, 0),
+					Amount:          testutils.NewDecimal(t, 10, 0),
 					Type:            transactions.TransactionTypeDebit,
 					TransactionTime: time.Date(2025, 03, 14, 10, 10, 10, 10, time.Local),
 				},
 				{
 					TrxID:           "2",
-					Amount:          newDecimal(t, 100, 0),
+					Amount:          testutils.NewDecimal(t, 100, 0),
 					Type:            transactions.TransactionTypeCredit,
 					TransactionTime: time.Date(2025, 03, 14, 10, 10, 10, 10, time.Local),
 				},
@@ -117,11 +108,11 @@ func TestProcess(t *testing.T) {
 			statements: map[string][]statements.Statement{
 				"bank1.csv": {{
 					UniqueIdentifier: "10",
-					Amount:           newDecimal(t, -10, 0),
+					Amount:           testutils.NewDecimal(t, -10, 0),
 					Date:             time.Date(2025, 03, 14, 0, 0, 0, 0, time.Local),
 				}, {
 					UniqueIdentifier: "100",
-					Amount:           newDecimal(t, 100, 0),
+					Amount:           testutils.NewDecimal(t, 100, 0),
 					Date:             time.Date(2025, 03, 14, 0, 0, 0, 0, time.Local),
 				}},
 			},
@@ -142,13 +133,13 @@ func TestProcess(t *testing.T) {
 			trancations: []transactions.Transaction{
 				{
 					TrxID:           "1",
-					Amount:          newDecimal(t, 10, 0),
+					Amount:          testutils.NewDecimal(t, 10, 0),
 					Type:            transactions.TransactionTypeCredit,
 					TransactionTime: time.Date(2025, 03, 14, 10, 10, 10, 10, time.Local),
 				},
 				{
 					TrxID:           "2",
-					Amount:          newDecimal(t, 20, 0),
+					Amount:          testutils.NewDecimal(t, 20, 0),
 					Type:            transactions.TransactionTypeCredit,
 					TransactionTime: time.Date(2025, 03, 14, 10, 10, 10, 10, time.Local),
 				},
@@ -156,7 +147,7 @@ func TestProcess(t *testing.T) {
 			statements: map[string][]statements.Statement{
 				"bank1.csv": {{
 					UniqueIdentifier: "10",
-					Amount:           newDecimal(t, 10, 0),
+					Amount:           testutils.NewDecimal(t, 10, 0),
 					Date:             time.Date(2025, 03, 14, 0, 0, 0, 0, time.Local),
 				}},
 			},
@@ -169,7 +160,7 @@ func TestProcess(t *testing.T) {
 				}{
 					Transactions: []transactions.Transaction{{
 						TrxID:           "2",
-						Amount:          newDecimal(t, 20, 0),
+						Amount:          testutils.NewDecimal(t, 20, 0),
 						Type:            transactions.TransactionTypeCredit,
 						TransactionTime: time.Date(2025, 03, 14, 10, 10, 10, 10, time.Local),
 					}},
@@ -183,7 +174,7 @@ func TestProcess(t *testing.T) {
 			statements: map[string][]statements.Statement{
 				"bank1.csv": {{
 					UniqueIdentifier: "10",
-					Amount:           newDecimal(t, 10, 0),
+					Amount:           testutils.NewDecimal(t, 10, 0),
 					Date:             time.Date(2025, 03, 14, 0, 0, 0, 0, time.Local),
 				}},
 			},
@@ -198,7 +189,7 @@ func TestProcess(t *testing.T) {
 					Statements: map[string][]statements.Statement{
 						"bank1.csv": {{
 							UniqueIdentifier: "10",
-							Amount:           newDecimal(t, 10, 0),
+							Amount:           testutils.NewDecimal(t, 10, 0),
 							Date:             time.Date(2025, 03, 14, 0, 0, 0, 0, time.Local),
 						}},
 					},
@@ -209,14 +200,14 @@ func TestProcess(t *testing.T) {
 			name: "show both unmatch for unmatch transaction and statements",
 			trancations: []transactions.Transaction{{
 				TrxID:           "1",
-				Amount:          newDecimal(t, 100, 0),
+				Amount:          testutils.NewDecimal(t, 100, 0),
 				Type:            transactions.TransactionTypeCredit,
 				TransactionTime: time.Date(2025, 03, 14, 10, 10, 10, 10, time.Local),
 			}},
 			statements: map[string][]statements.Statement{
 				"bank1.csv": {{
 					UniqueIdentifier: "10",
-					Amount:           newDecimal(t, 10, 0),
+					Amount:           testutils.NewDecimal(t, 10, 0),
 					Date:             time.Date(2025, 03, 14, 0, 0, 0, 0, time.Local),
 				}},
 			},
@@ -229,14 +220,14 @@ func TestProcess(t *testing.T) {
 				}{
 					Transactions: []transactions.Transaction{{
 						TrxID:           "1",
-						Amount:          newDecimal(t, 100, 0),
+						Amount:          testutils.NewDecimal(t, 100, 0),
 						Type:            transactions.TransactionTypeCredit,
 						TransactionTime: time.Date(2025, 03, 14, 10, 10, 10, 10, time.Local),
 					}},
 					Statements: map[string][]statements.Statement{
 						"bank1.csv": {{
 							UniqueIdentifier: "10",
-							Amount:           newDecimal(t, 10, 0),
+							Amount:           testutils.NewDecimal(t, 10, 0),
 							Date:             time.Date(2025, 03, 14, 0, 0, 0, 0, time.Local),
 						}},
 					},
@@ -249,12 +240,12 @@ func TestProcess(t *testing.T) {
 			statements: map[string][]statements.Statement{
 				"bank1.csv": {{
 					UniqueIdentifier: "10",
-					Amount:           newDecimal(t, 10, 0),
+					Amount:           testutils.NewDecimal(t, 10, 0),
 					Date:             time.Date(2025, 03, 14, 0, 0, 0, 0, time.Local),
 				}},
 				"bank2.csv": {{
 					UniqueIdentifier: "10",
-					Amount:           newDecimal(t, 10, 0),
+					Amount:           testutils.NewDecimal(t, 10, 0),
 					Date:             time.Date(2025, 03, 14, 0, 0, 0, 0, time.Local),
 				}},
 			},
@@ -269,12 +260,12 @@ func TestProcess(t *testing.T) {
 					Statements: map[string][]statements.Statement{
 						"bank1.csv": {{
 							UniqueIdentifier: "10",
-							Amount:           newDecimal(t, 10, 0),
+							Amount:           testutils.NewDecimal(t, 10, 0),
 							Date:             time.Date(2025, 03, 14, 0, 0, 0, 0, time.Local),
 						}},
 						"bank2.csv": {{
 							UniqueIdentifier: "10",
-							Amount:           newDecimal(t, 10, 0),
+							Amount:           testutils.NewDecimal(t, 10, 0),
 							Date:             time.Date(2025, 03, 14, 0, 0, 0, 0, time.Local),
 						}},
 					},

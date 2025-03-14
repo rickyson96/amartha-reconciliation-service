@@ -6,17 +6,8 @@ import (
 	"time"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/govalues/decimal"
+	"github.com/rickyson96/amartha-reconciliation-service/internal/testutils"
 )
-
-func newDecimal(t *testing.T, value int64, scale int) decimal.Decimal {
-	t.Helper()
-	d, err := decimal.New(value, scale)
-	if err != nil {
-		t.Errorf("newDecimal(%d, %d) failed: %v", value, scale, err)
-	}
-	return d
-}
 
 func TestParse(t *testing.T) {
 	tests := []struct {
@@ -30,7 +21,7 @@ func TestParse(t *testing.T) {
 			data: []string{"1", "10", "DEBIT", "2025-10-01 11:12:13"},
 			want: Transaction{
 				TrxID:           "1",
-				Amount:          newDecimal(t, 10, 0),
+				Amount:          testutils.NewDecimal(t, 10, 0),
 				Type:            TransactionTypeDebit,
 				TransactionTime: time.Date(2025, 10, 01, 11, 12, 13, 0, time.UTC),
 			},
@@ -41,7 +32,7 @@ func TestParse(t *testing.T) {
 			data: []string{"1", "10.01", "CREDIT", "2025-10-01 11:12:13"},
 			want: Transaction{
 				TrxID:           "1",
-				Amount:          newDecimal(t, 1001, 2),
+				Amount:          testutils.NewDecimal(t, 1001, 2),
 				Type:            TransactionTypeCredit,
 				TransactionTime: time.Date(2025, 10, 01, 11, 12, 13, 0, time.UTC),
 			},
@@ -109,7 +100,7 @@ func TestFilter(t *testing.T) {
 			trxDate, _ := time.Parse(time.DateTime, test.trxDate)
 			trx := Transaction{
 				TrxID:           "1",
-				Amount:          newDecimal(t, 10, 0),
+				Amount:          testutils.NewDecimal(t, 10, 0),
 				Type:            TransactionTypeDebit,
 				TransactionTime: trxDate,
 			}

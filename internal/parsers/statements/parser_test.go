@@ -5,17 +5,8 @@ import (
 	"time"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/govalues/decimal"
+	"github.com/rickyson96/amartha-reconciliation-service/internal/testutils"
 )
-
-func newDecimal(t *testing.T, value int64, scale int) decimal.Decimal {
-	t.Helper()
-	d, err := decimal.New(value, scale)
-	if err != nil {
-		t.Errorf("newDecimal(%d, %d) failed: %v", value, scale, err)
-	}
-	return d
-}
 
 func TestParse(t *testing.T) {
 	tests := []struct {
@@ -29,7 +20,7 @@ func TestParse(t *testing.T) {
 			data: []string{"1", "10", "2025-01-02"},
 			want: Statement{
 				UniqueIdentifier: "1",
-				Amount:           newDecimal(t, 10, 0),
+				Amount:           testutils.NewDecimal(t, 10, 0),
 				Date:             time.Date(2025, 01, 02, 0, 0, 0, 0, time.UTC),
 			},
 			wantErr: false,
@@ -39,7 +30,7 @@ func TestParse(t *testing.T) {
 			data: []string{"1", "-10", "2025-01-02"},
 			want: Statement{
 				UniqueIdentifier: "1",
-				Amount:           newDecimal(t, -10, 0),
+				Amount:           testutils.NewDecimal(t, -10, 0),
 				Date:             time.Date(2025, 01, 02, 0, 0, 0, 0, time.UTC),
 			},
 			wantErr: false,
@@ -89,7 +80,7 @@ func TestFilter(t *testing.T) {
 			stmtDate, _ := time.Parse(time.DateOnly, test.date)
 			stmt := Statement{
 				UniqueIdentifier: "1",
-				Amount:           newDecimal(t, 10, 0),
+				Amount:           testutils.NewDecimal(t, 10, 0),
 				Date:             stmtDate,
 			}
 			got := filter(startDate, endDate)(stmt)
