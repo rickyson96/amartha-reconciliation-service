@@ -16,12 +16,12 @@ type testData struct {
 	statements   map[string][]statements.Statement
 }
 
-func generateTestData(b *testing.B) testData {
+func generateTestData(b *testing.B, dataCount int) testData {
 	td := testData{
 		transactions: []transactions.Transaction{},
 		statements:   map[string][]statements.Statement{},
 	}
-	for i := range 100 {
+	for i := range dataCount {
 		td.transactions = append(td.transactions,
 			transactions.Transaction{
 				TrxID:           strconv.Itoa(i),
@@ -51,8 +51,32 @@ func generateTestData(b *testing.B) testData {
 	return td
 }
 
-func BenchmarkProcess(b *testing.B) {
-	testData := generateTestData(b)
+// func BenchmarkProcess(b *testing.B) {
+// 	testData := generateTestData(b, 10)
+//
+// 	// Reset timer to ignore setup time
+// 	b.ResetTimer()
+//
+// 	for b.Loop() {
+// 		reconciliation.Process(testData.transactions, testData.statements)
+// 	}
+// }
+//
+// func BenchmarkProcessConcurrent(b *testing.B) {
+// 	testData := generateTestData(b, 10)
+// 	trxReader := newTestReader(testData.transactions)
+// 	stmtReader := newTestReader(fileStatementPairConverter(testData.statements))
+//
+// 	// Reset timer to ignore setup time
+// 	b.ResetTimer()
+//
+// 	for b.Loop() {
+// 		reconciliation.ProcessConcurrent(trxReader.Read, stmtReader.Read)
+// 	}
+// }
+
+func benchmarkProcess(b *testing.B, count int) {
+	testData := generateTestData(b, count)
 
 	// Reset timer to ignore setup time
 	b.ResetTimer()
@@ -62,8 +86,8 @@ func BenchmarkProcess(b *testing.B) {
 	}
 }
 
-func BenchmarkProcessConcurrent(b *testing.B) {
-	testData := generateTestData(b)
+func benchmarkProcessConcurrent(b *testing.B, count int) {
+	testData := generateTestData(b, count)
 	trxReader := newTestReader(testData.transactions)
 	stmtReader := newTestReader(fileStatementPairConverter(testData.statements))
 
@@ -74,3 +98,18 @@ func BenchmarkProcessConcurrent(b *testing.B) {
 		reconciliation.ProcessConcurrent(trxReader.Read, stmtReader.Read)
 	}
 }
+
+func BenchmarkProcess10(b *testing.B)           { benchmarkProcess(b, 10) }
+func BenchmarkProcessConcurrent10(b *testing.B) { benchmarkProcessConcurrent(b, 10) }
+
+func BenchmarkProcess100(b *testing.B)           { benchmarkProcess(b, 100) }
+func BenchmarkProcessConcurrent100(b *testing.B) { benchmarkProcessConcurrent(b, 100) }
+
+func BenchmarkProcess1000(b *testing.B)           { benchmarkProcess(b, 1000) }
+func BenchmarkProcessConcurrent1000(b *testing.B) { benchmarkProcessConcurrent(b, 1000) }
+
+func BenchmarkProcess10000(b *testing.B)           { benchmarkProcess(b, 10000) }
+func BenchmarkProcessConcurrent10000(b *testing.B) { benchmarkProcessConcurrent(b, 10000) }
+
+func BenchmarkProcess100000(b *testing.B)           { benchmarkProcess(b, 100000) }
+func BenchmarkProcessConcurrent100000(b *testing.B) { benchmarkProcessConcurrent(b, 100000) }
