@@ -62,17 +62,11 @@ func main() {
 		fatalWithUsage("ERROR: end date wrong format: %v", err)
 	}
 
-	trxs, err := parseTransactions(transactionFile, startDate, endDate)
+	result, err := process(transactionFile, statementFiles, startDate, endDate)
+	// result, err := processConcurrent(transactionFile, statementFiles, startDate, endDate)
 	if err != nil {
-		log.Fatalf("parseTransactions error: %v", err)
+		log.Fatalf("ERROR: process: %v", err)
 	}
-
-	stmts, err := parseStatements(statementFiles, startDate, endDate)
-	if err != nil {
-		log.Fatalf("parseTransactions error: %v", err)
-	}
-
-	result := reconciliation.Process(trxs, stmts)
 
 	printReconciliation(result)
 }

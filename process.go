@@ -7,6 +7,7 @@ import (
 
 	"github.com/rickyson96/amartha-reconciliation-service/internal/parsers/statements"
 	"github.com/rickyson96/amartha-reconciliation-service/internal/parsers/transactions"
+	"github.com/rickyson96/amartha-reconciliation-service/internal/processes/reconciliation"
 )
 
 func parseTransactions(fileName string, startDate, endDate time.Time) ([]transactions.Transaction, error) {
@@ -47,4 +48,18 @@ func parseStatements(files []string, startDate, endDate time.Time) (map[string][
 	}
 
 	return statementsMap, nil
+}
+
+func process(transactionFile string, statementFiles []string, startDate, endDate time.Time) (reconciliation.Result, error) {
+	trxs, err := parseTransactions(transactionFile, startDate, endDate)
+	if err != nil {
+		return reconciliation.Result{}, err
+	}
+
+	stmts, err := parseStatements(statementFiles, startDate, endDate)
+	if err != nil {
+		return reconciliation.Result{}, err
+	}
+
+	return reconciliation.Process(trxs, stmts), nil
 }
