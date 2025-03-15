@@ -6,7 +6,7 @@ import (
 	"github.com/govalues/decimal"
 )
 
-func NewDecimal(t *testing.T, value int64, scale int) decimal.Decimal {
+func NewDecimal(t testing.TB, value int64, scale int) decimal.Decimal {
 	t.Helper()
 	d, err := decimal.New(value, scale)
 	if err != nil {
