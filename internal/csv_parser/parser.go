@@ -6,10 +6,11 @@ import (
 )
 
 type CSVParser[T any] struct {
-	csvReader *csv.Reader
-	parser    func(data []string) (T, error)
-	filter    func(data T) bool
-	hasHeader bool
+	csvReader     *csv.Reader
+	parser        func(data []string) (T, error)
+	filter        func(data T) bool
+	hasHeader     bool
+	hasReadHeader bool
 }
 
 type CSVParserOptions struct {
@@ -44,6 +45,7 @@ func (p *CSVParser[T]) Parse() ([]T, error) {
 	if p.hasHeader {
 		// Read off the header
 		p.csvReader.Read()
+		p.hasReadHeader = true
 	}
 
 	for {
@@ -67,4 +69,36 @@ func (p *CSVParser[T]) Parse() ([]T, error) {
 	}
 
 	return result, nil
+}
+
+// Read is used to read through the csv file one line at a time.
+//
+// This mainly utilizes underlying [csv.Reader.Read] method, while
+// helping to parse data using the parser function, and filter the
+// data usig the filter function. This is useful for streaming csv
+// data.
+//
+// It will try to skip ahead when the data is being filtered
+// It'll also skip the header according to [CSVParser.hasHeader].
+// It'll return [io.EOF] error when it reaches the last input
+func (p *CSVParser[T]) Read() (T, error) {
+	if p.hasHeader && !p.hasReadHeader {
+		p.csvReader.Read()
+		p.hasReadHeader = true
+	}
+
+	data, err := p.csvReader.Read()
+	if err != nil {
+		return *new(T), err
+	}
+
+	parsed, err := p.parser(data)
+	if err != nil {
+		return *new(T), err
+	}
+
+	if !p.filter(parsed) {
+		return p.Read()
+	}
+	return parsed, nil
 }
